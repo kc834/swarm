@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "rqt_grounding_and_analysis")
+set(rqt_grounding_and_analysis_MAINTAINER "catherine <catherine@todo.todo>")
+set(rqt_grounding_and_analysis_DEPRECATED "")
+set(rqt_grounding_and_analysis_VERSION "0.0.0")
+set(rqt_grounding_and_analysis_BUILD_DEPENDS "rospy" "rqt_gui" "rqt_gui_py")
+set(rqt_grounding_and_analysis_RUN_DEPENDS "rospy" "rqt_gui" "rqt_gui_py")
+set(rqt_grounding_and_analysis_BUILDTOOL_DEPENDS "catkin")

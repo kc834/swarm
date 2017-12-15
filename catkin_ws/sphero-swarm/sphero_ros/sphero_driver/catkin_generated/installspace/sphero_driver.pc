@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: sphero_driver
+Description: Description of sphero_driver
+Version: 0.1.2
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 

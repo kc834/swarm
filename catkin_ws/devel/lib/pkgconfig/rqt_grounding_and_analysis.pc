@@ -1,0 +1,8 @@
+prefix=/home/kchaudhari/catkin_ws/devel
+
+Name: rqt_grounding_and_analysis
+Description: Description of rqt_grounding_and_analysis
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kchaudhari/catkin_ws/devel/lib 
+Requires: 

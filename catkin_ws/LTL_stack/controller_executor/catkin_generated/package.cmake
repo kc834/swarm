@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "controller_executor")
+set(controller_executor_MAINTAINER "Catherine Wong <kw358@cornell.edu>, Catherine Wong <kw358@cornell.edu>")
+set(controller_executor_DEPRECATED "")
+set(controller_executor_VERSION "0.0.0")
+set(controller_executor_BUILD_DEPENDS "roscpp" "rospy" "std_msgs")
+set(controller_executor_RUN_DEPENDS "roscpp" "rospy" "std_msgs")
+set(controller_executor_BUILDTOOL_DEPENDS "catkin")

@@ -1,0 +1,8 @@
+prefix=/home/kchaudhari/catkin_ws/install
+
+Name: turns
+Description: Description of turns
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kchaudhari/catkin_ws/install/lib 
+Requires: 

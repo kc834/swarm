@@ -1,0 +1,8 @@
+prefix=/home/kchaudhari/catkin_ws/install
+
+Name: sphero_control
+Description: Description of sphero_control
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kchaudhari/catkin_ws/install/lib 
+Requires: 

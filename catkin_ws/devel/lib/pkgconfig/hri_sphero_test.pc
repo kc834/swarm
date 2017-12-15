@@ -1,0 +1,8 @@
+prefix=/home/kchaudhari/catkin_ws/devel
+
+Name: hri_sphero_test
+Description: Description of hri_sphero_test
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kchaudhari/catkin_ws/devel/lib 
+Requires: 

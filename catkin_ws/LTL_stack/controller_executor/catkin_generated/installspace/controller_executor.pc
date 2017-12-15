@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: controller_executor
+Description: Description of controller_executor
+Version: 0.0.0
+Cflags: -I/usr/local/include
+Libs: -L/usr/local/lib 
+Requires: 

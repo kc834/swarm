@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "slugs_ros")
+set(slugs_ros_MAINTAINER "Catherine Wong <kw358@cornell.edu>, Catherine Wong <kw358@cornell.edu>")
+set(slugs_ros_DEPRECATED "")
+set(slugs_ros_VERSION "0.0.0")
+set(slugs_ros_BUILD_DEPENDS "roscpp" "rospy" "std_msgs" "actionlib" "actionlib_msgs" "message_generation")
+set(slugs_ros_RUN_DEPENDS "roscpp" "rospy" "std_msgs" "actionlib" "actionlib_msgs" "message_runtime")
+set(slugs_ros_BUILDTOOL_DEPENDS "catkin")

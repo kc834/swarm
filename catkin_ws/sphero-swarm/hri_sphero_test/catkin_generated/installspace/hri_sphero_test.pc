@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: hri_sphero_test
+Description: Description of hri_sphero_test
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 

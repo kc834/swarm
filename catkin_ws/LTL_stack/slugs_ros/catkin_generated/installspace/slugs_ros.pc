@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: slugs_ros
+Description: Description of slugs_ros
+Version: 0.0.0
+Cflags: -I/usr/local/include
+Libs: -L/usr/local/lib 
+Requires: actionlib_msgs

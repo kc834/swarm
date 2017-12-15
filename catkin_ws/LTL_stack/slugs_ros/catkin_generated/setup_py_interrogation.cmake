@@ -1,0 +1,6 @@
+set(slugs_ros_SETUP_PY_VERSION "0.0.0")
+set(slugs_ros_SETUP_PY_SCRIPTS "")
+set(slugs_ros_SETUP_PY_PACKAGES "slugs_ros")
+set(slugs_ros_SETUP_PY_PACKAGE_DIRS "src/slugs_ros")
+set(slugs_ros_SETUP_PY_MODULES "")
+set(slugs_ros_SETUP_PY_MODULE_DIRS "")

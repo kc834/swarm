@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: rqt_grounding_and_analysis
+Description: Description of rqt_grounding_and_analysis
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 

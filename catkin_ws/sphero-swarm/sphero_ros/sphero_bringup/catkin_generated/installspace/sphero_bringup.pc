@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: sphero_bringup
+Description: Description of sphero_bringup
+Version: 0.1.2
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 

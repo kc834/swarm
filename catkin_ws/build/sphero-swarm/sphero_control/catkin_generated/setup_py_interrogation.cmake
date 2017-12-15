@@ -1,0 +1,6 @@
+set(sphero_control_SETUP_PY_VERSION "0.0.0")
+set(sphero_control_SETUP_PY_SCRIPTS "")
+set(sphero_control_SETUP_PY_PACKAGES "rqt_grounding_and_analysis")
+set(sphero_control_SETUP_PY_PACKAGE_DIRS "src/rqt_grounding_and_analysis")
+set(sphero_control_SETUP_PY_MODULES "")
+set(sphero_control_SETUP_PY_MODULE_DIRS "")

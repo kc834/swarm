@@ -1,0 +1,8 @@
+prefix=/home/kchaudhari/catkin_ws/install
+
+Name: controller_executor
+Description: Description of controller_executor
+Version: 0.0.0
+Cflags: -I/home/kchaudhari/catkin_ws/install/include
+Libs: -L/home/kchaudhari/catkin_ws/install/lib 
+Requires: 

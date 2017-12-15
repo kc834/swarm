@@ -1,0 +1,2 @@
+beginner_tutorials:sphero-swarm/hri_sphero_test:sphero-swarm/sphero_control:sphero-swarm/sphero_ros/sphero_bringup:sphero-swarm/sphero_ros/sphero_description:sphero-swarm/sphero_ros/sphero_driver:sphero-swarm/sphero_ros/sphero_node:turns
+-DCATKIN_DEVEL_PREFIX=/home/kchaudhari/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kchaudhari/catkin_ws/install -G Unix Makefiles

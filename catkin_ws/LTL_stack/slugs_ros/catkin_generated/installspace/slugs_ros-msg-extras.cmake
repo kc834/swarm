@@ -1,0 +1,2 @@
+set(slugs_ros_MESSAGE_FILES "msg/StringArray.msg;msg/SlugsSynthesisAction.msg;msg/SlugsSynthesisActionGoal.msg;msg/SlugsSynthesisActionResult.msg;msg/SlugsSynthesisActionFeedback.msg;msg/SlugsSynthesisGoal.msg;msg/SlugsSynthesisResult.msg;msg/SlugsSynthesisFeedback.msg")
+set(slugs_ros_SERVICE_FILES "srv/SlugsInitExecutionString.srv;srv/SlugsInitExecutionArray.srv;srv/SlugsTransExecutionString.srv;srv/SlugsTransExecutionArray.srv;srv/SlugsSetGoal.srv;srv/SlugsGetInputs.srv;srv/SlugsGetOutputs.srv")
