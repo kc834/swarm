@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <arg name='a'/>
+  <arg name='b'/>
+  <arg name='c'/>
+  <arg name='d'/>
+  <arg name='e'/>
+  <include file="connect1.launch">
+    <arg name="RPR" value="$(eval a == 'RPR')"/>
+  </include>
+</launch>
