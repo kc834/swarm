@@ -61,7 +61,8 @@ class ViconTrackerPoseHandler(object):
         return array([self.x, self.y, self.o])
 
 if __name__ == "__main__":
-    a = ViconTrackerPoseHandler(None, None, "",51024, "rpp")
+    a = ViconTrackerPoseHandler(None, None, "",int(sys.argv[1]), "pbp")
+    print "Checkin port " + str(int(sys.argv[1]))
     print a.getPose()
-    time.sleep(10)
+    # time.sleep(10)
     print a.getPose()

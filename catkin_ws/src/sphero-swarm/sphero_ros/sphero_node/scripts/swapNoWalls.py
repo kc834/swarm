@@ -310,6 +310,24 @@ for ind in range(0,num_waypoints):
 
             # find vector from current position to goal and distance per spheros
             vect2goal[i] = numpy.array([(loc_goal[i][0]-locAll[i+Diff][0]),(loc_goal[i][1]-locAll[i+Diff][1])])
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print "FUCK"
+            print vect2goal[i]
             dist2goal[i] =  numpy.sqrt(vect2goal[i].dot(vect2goal[i]))
 
             #Calculate the required vel_msg to reach the goal point from the current location in the vicon frame

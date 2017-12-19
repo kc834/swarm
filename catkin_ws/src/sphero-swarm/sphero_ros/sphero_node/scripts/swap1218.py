@@ -20,10 +20,10 @@ from collisionFreeDecentralized import *
 
 # declaring variables
 # current speed
-# odometry = None
+odometry = None
 
 # offset speed
-# init_odom = None
+init_odom = None
 
 # angle of speed
 theta_cal=0
@@ -34,18 +34,18 @@ wallRange = 5.0
 # All possible matrices where 1st and 2nd wall can be negative or positive
 MAP = numpy.matrix([[-wallRange,-wallRange,wallRange,-wallRange],[wallRange,-wallRange,wallRange,wallRange],[wallRange,wallRange,-wallRange,wallRange],[-wallRange,wallRange,-wallRange,-wallRange]])
 
-# def save_odometry(data):
-#     global odometry
-#
-#     # If this is the first data input, save in init_odom
-#     if odometry is None:
-#         global init_odom
-#
-#         # Set init_odom to position? [Probably a change in position type of deal]
-#         init_odom = data.pose.pose
-#
-#     # Always change odometry to data.pose.pose
-#     odometry =data.pose.pose
+def save_odometry(data):
+    global odometry
+
+    # If this is the first data input, save in init_odom
+    if odometry is None:
+        global init_odom
+
+        # Set init_odom to position? [Probably a change in position type of deal]
+        init_odom = data.pose.pose
+
+    # Always change odometry to data.pose.pose
+    odometry =data.pose.pose
 
 def parkControl(Region, row, loc):
     if Region == 1:
@@ -91,42 +91,6 @@ def parkControl(Region, row, loc):
         sys.exit(0)
     return [row, loc, rowAdj, locAdj, rowAdjAdj, locAdjAdj]
 
-def moveGood(bVicon, v_x_V_new, v_y_V_new, i):
-    startTime = time.time()
-    print "stalling at i = " + str(i)
-    print v_x_V_new
-    print v_y_V_new
-    while time.time() - startTime < 40:
-        # Get your position
-        init_calib_loc = bVicon[i].getPose()
-        # I guess this is x and y
-        time.sleep(0.2)
-
-        fin_calib_loc = bVicon[i].getPose()
-
-        calibVect = numpy.array([fin_calib_loc[0]-init_calib_loc[0],fin_calib_loc[1]-init_calib_loc[1]])
-        labVel = numpy.linalg.norm(calibVect)
-
-
-        if v_x_V_new > 0 or v_y_V_new > 0:
-            if labVel > 0.005:
-                if v_x_V_new > 0 and fin_calib_loc[0] - init_calib_loc[0] > 0:
-                    if v_y_V_new > 0 and fin_calib_loc[1] - init_calib_loc[1] > 0:
-                        return True
-                if v_x_V_new > 0 and fin_calib_loc[0] - init_calib_loc[0] > 0:
-                    if v_y_V_new < 0 and fin_calib_loc[1] - init_calib_loc[1] < 0:
-                        return True
-                if v_x_V_new < 0 and fin_calib_loc[0] - init_calib_loc[0] < 0:
-                    if v_y_V_new > 0 and fin_calib_loc[1] - init_calib_loc[1] > 0:
-                        return True
-                if v_x_V_new < 0 and fin_calib_loc[0] - init_calib_loc[0] < 0:
-                    if v_y_V_new < 0 and fin_calib_loc[1] - init_calib_loc[1] < 0:
-                        return True
-
-        else:
-                if labVel < 0.005:
-                    return True
-    return False
 
 #Define the waypoints to be visited and the speed at which to visit them
     # magnitude min 5 for lab ground
@@ -177,7 +141,7 @@ if __name__=="__main__":
     mW = numpy.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
     # short for step. commonly used variable when determining location.
-    s = obj.Ds
+    s = 3 * (obj.Ds)/4
 
     park = numpy.array([ [ [s,5*s, -1] , [3*s,5*s, -1] , [5*s, 5*s, -1] ],
                          [ [s,3*s, -1] , [3*s,3*s, -1] , [5*s, 3*s, -1] ],
@@ -210,8 +174,9 @@ if __name__=="__main__":
 
     # Publish a color and a velocity to each sphero
     for i in range(Num):
-        pub[i] = rospy.Publisher(sphero_name[i]+'/cmd_vel', geometry_msgs.msg.Twist, queue_size=1, latch=True, tcp_nodelay=True)
-        color_pub[i] = rospy.Publisher(sphero_name[i] + '/set_color', ColorRGBA, queue_size=1, latch=True, tcp_nodelay=True)
+        pub[i] = rospy.Publisher(sphero_name[i]+'/cmd_vel', geometry_msgs.msg.Twist, queue_size=1, latch=True)
+        sub[i] = rospy.Subscriber(sphero_name[i]+'/cmd_vel', geometry_msgs.msg.Twist, queue_size=1)
+        color_pub[i] = rospy.Publisher(sphero_name[i] + '/set_color', ColorRGBA, queue_size=1, latch=True)
 
     # green and blue. we like green better.
     grn_color = std_msgs.msg.ColorRGBA(g=255)
@@ -221,11 +186,11 @@ if __name__=="__main__":
     # some bool
     flash_risingEdge = True
 
-    rate = rospy.Rate(12) # set publish rate
+    rate = rospy.Rate(20) # set publish rate
 
     # subscribe to odometry data. Callback is invoked with the message as the
     # first argument.
-    # rospy.Subscriber(sphero_name[0]+'/odom', Odometry, callback=save_odometry)
+    rospy.Subscriber(sphero_name[0]+'/odom', Odometry, callback=save_odometry)
 
     #Initialize the sphero as a vicon tracked object
     aVicon = [[]]*numAll
@@ -294,7 +259,7 @@ if __name__=="__main__":
             pub[i].publish(vel_msg)
             rate.sleep()
 
-            time.sleep(Num * 2)
+            time.sleep(5)
             # Get the final position of the sphero
             fin_calib_loc = bVicon[i].getPose()
             # The calibration vector is found by using delta x and delta y
@@ -310,7 +275,10 @@ if __name__=="__main__":
 
         # Set sphero_theta to calibration theta
         sphero_theta[i] = calib_theta
-        velNum[i] = 1.5 * veltmp
+        velScale = 0.5/labVel
+        velNum[i] = velScale * 10 + veltmp - 10
+
+    time.sleep(10)
 
     # Find location of all
     locAll = [[]]*numAll
@@ -320,7 +288,6 @@ if __name__=="__main__":
     delay = [defaultTime for x in range(Num)]
 
     moveVect = [1 for x in range(Num)]
-    reach = [0 for x in range(Num)]
 
     #loop through the goal points and move to all of them
     for ind in range(0,num_waypoints):
@@ -358,10 +325,6 @@ if __name__=="__main__":
 
         # tik tok
         start = time.time()
-
-        thetaNew = [0 for x in range(Num)]
-
-        mG = True
 
         # Assume 0.1*(Num+2) is small enough that it's basically 0
         while (dist2goalAll > 0.1*(Num+2)): # not at goal point
@@ -457,34 +420,7 @@ if __name__=="__main__":
                     if poseAll[1,i+Diff] > bottomWall and poseAll[1,i+Diff] < topWall:
                         Region = 5
 
-                if Region == 5 and delay[i] == defaultTime and moveVect[i] != 0:
-                    for k in range(Num):
-                        if i != k:
-                            moveVect[k] = 0
-                    delay[i] = time.time()
-                    currentWay = numpy.linalg.norm([ loc_goal[i][0] - poseAll[0,i+Diff], loc_goal[i][1] - poseAll[1,i+Diff]])
-                    vel_msg_zero = geometry_msgs.msg.Twist(geometry_msgs.msg.Vector3(0,0,0), \
-                                                  	geometry_msgs.msg.Vector3(0,0,0))
-                    pub[i].publish(vel_msg_zero)
-                    rate.sleep()
-                    for i in range(3):
-                        for k in park[i]:
-                            dist = numpy.linalg.norm([ k[0] - poseAll[0,i+Diff], k[1] - poseAll[1,i+Diff]])
-                            if dist == currentWay:
-                                row = i
-                                col = k
-                            if dist < currentWay:
-                                currentWay = dist
-                                obj.goalPose[0,Diff+i] = k[0]
-                                obj.goalPose[1,Diff+i] = k[1]
-                                row = i
-                                col = k
-                    mW[row][col] = 1
-
                 if 4 >= Region >= 1 and delay[i] == defaultTime and moveVect[i] != 0:
-                    vel_msg_zero = geometry_msgs.msg.Twist(geometry_msgs.msg.Vector3(0,0,0), \
-                                                  	geometry_msgs.msg.Vector3(0,0,0))
-                    pub[i].publish(vel_msg_zero)
                     rate.sleep()
                     for k in range(Num):
                         if i != k:
@@ -492,6 +428,10 @@ if __name__=="__main__":
                     delay[i] = time.time()
                     print "region recognized"
                     #stop the sphero
+                    vel_msg_zero = geometry_msgs.msg.Twist(geometry_msgs.msg.Vector3(0,0,0), \
+                                                  	geometry_msgs.msg.Vector3(0,0,0))
+                    pub[i].publish(vel_msg_zero)
+                    rate.sleep()
                     #check the metaList for parking
                     #If parking available in adjacent cells
 
@@ -526,7 +466,6 @@ if __name__=="__main__":
                             obj.goalPose[1,Diff+botIndex] = loc_goal[botIndex][1]
                             park[row][loc][2] = botIndex
                             moveVect[botIndex] = 1
-                            reach[botIndex] = 0
                             # Change waypoint of first bot to row 1 cell
                             loc_goal[i][0] = park[rowAdj][locAdj][0]
                             loc_goal[i][1] = park[rowAdj][locAdj][1]
@@ -553,7 +492,6 @@ if __name__=="__main__":
                                 obj.goalPose[1,Diff+botIndex] = loc_goal[botIndex][1]
                                 park[row][loc][2] = botIndex
                                 moveVect[botIndex] = 1
-                                reach[botIndex] = 0
                                 # Move the adjacent bot in row 1 to row 2
                                 botIndex = park[rowAdjAdj][locAdjAdj][2]
                                 # PRETEND THAT I = J
@@ -563,7 +501,6 @@ if __name__=="__main__":
                                 obj.goalPose[1,Diff+botIndex] = loc_goal[botIndex][1]
                                 park[rowAdj][locAdj][2] = botIndex
                                 moveVect[botIndex] = 0.01 * rowInit
-                                reach[botIndex] = 0
                                 # Change waypoint of first bot to row 1 cell
                                 loc_goal[i][0] = park[rowAdjAdj][locAdjAdj][0]
                                 loc_goal[i][1] = park[rowAdjAdj][locAdjAdj][1]
@@ -612,22 +549,15 @@ if __name__=="__main__":
                             print obj.goalPose[0,Diff+i]
                             print obj.goalPose[1,Diff+i]
 
-                            thetaOld = thetaNew[i]
-
                             v_vect_V_actual = actualController(poseAll[:,i+Diff],i+Diff,statesNeighbor,indNeighbor,obj,MAP)
                             print "actual_vel="
                             print v_vect_V_actual
 
                             v_vect_V_actual = numpy.array([[v_vect_V_actual[0]],[v_vect_V_actual[1]]])
 
-                            thetaNew[i] = numpy.arctan2((v_vect_V_actual[1]),(v_vect_V_actual[0]))
-
-                            if thetaOld != 0 and thetaNew[i] != thetaOld:
-                                v_x_V_new = 0.9 * moveVect[i] * velNum[i] * math.cos(thetaNew[i])
-                                v_y_V_new = 0.9 * moveVect[i] * velNum[i] * math.sin(thetaNew[i])
-                            else:
-                                v_x_V_new = moveVect[i] * velNum[i] * math.cos(thetaNew[i])
-                                v_y_V_new = moveVect[i] * velNum[i] * math.sin(thetaNew[i])
+                            thetaNew = numpy.arctan2((v_vect_V_actual[1]),(v_vect_V_actual[0]))
+                            v_x_V_new = moveVect[i] * velNum[i] * math.cos(thetaNew)
+                            v_y_V_new = moveVect[i] * velNum[i] * math.sin(thetaNew)
 
                             print moveVect[i]
                             print velNum[i]
@@ -644,7 +574,7 @@ if __name__=="__main__":
                             print locAll[i+Diff]
 
                             R_SV=numpy.array([ [math.cos(sphero_theta[i]),math.sin(sphero_theta[i])],[-math.sin(sphero_theta[i]), math.cos(sphero_theta[i])] ])
-                            # convert global frame to sphero frame
+                	       # convert global frame to sphero frame
                             v_vect_S=numpy.dot(R_SV,v_vect_V_update)
                             v_x_S=v_vect_S[0]
                             v_y_S=v_vect_S[1]
@@ -652,36 +582,32 @@ if __name__=="__main__":
                             print v_x_S
                             print v_y_S
                         else:
-                            print obj.goalPose[0,Diff+i]
-                            print obj.goalPose[1,Diff+i]
-
-                            thetaOld = thetaNew[i]
-
-                            thetaNew[i] = numpy.arctan2((loc_goal[i][1]-locAll[i+Diff][1]), (loc_goal[i][0]-locAll[i+Diff][0]))
-
-                            v_x_V_new = 0.9 * moveVect[i] * velNum[i] * math.cos(thetaNew[i])
-                            v_y_V_new = 0.9 * moveVect[i] * velNum[i] * math.sin(thetaNew[i])
-
-                            print moveVect[i]
-                            print velNum[i]
-
+                            print "run"
+                            thetaNew = numpy.arctan2((loc_goal[i][1]-locAll[i+Diff][1]), (loc_goal[i][0]-locAll[i+Diff][0]))
+                            print "run"
+                            # This is the minimum velocity at which the sphero must move to observe a change in position
+                            v_x_V_base = moveVect[i] * velMin[i] * math.cos(thetaNew)
+                            v_y_V_base = moveVect[i] * velMin[i] * math.sin(thetaNew)
+                            print "run"
+                            # This scales the velocity according to the distance of the sphero from its goal
+                            v_x_V_change = dist2goal[i] / (moveVect[i] * (velNum[i] - velMin[i]) * math.cos(thetaNew))
+                            v_y_V_change = dist2goal[i] / (moveVect[i] * (velNum[i] - velMin[i]) * math.sin(thetaNew))
+                            print "run"
+                            # This is the new, scaled velocity
+                            v_x_V_new = v_x_V_base + v_x_V_change
+                            v_y_V_new = v_y_V_base + v_y_V_change
+                            print v_x_V_new
+                            print v_y_V_new
+                            print "run"
                             v_vect_V_update = numpy.array([[v_x_V_new],[v_y_V_new]])
-
-                            print "actual_vel new is"
-                            print v_vect_V_update
-
-                            print obj.goalPose[0,Diff+i]
-                            print obj.goalPose[1,Diff+i]
-
-                            print "Position is"
-                            print locAll[i+Diff]
-
+                            print "run"
                             R_SV=numpy.array([ [math.cos(sphero_theta[i]),math.sin(sphero_theta[i])],[-math.sin(sphero_theta[i]), math.cos(sphero_theta[i])] ])
-                            # convert global frame to sphero frame
+                            print "run"
                             v_vect_S=numpy.dot(R_SV,v_vect_V_update)
+                            print "run"
                             v_x_S=v_vect_S[0]
+                            print "run"
                             v_y_S=v_vect_S[1]
-
                             print v_x_S
                             print v_y_S
 
@@ -699,15 +625,9 @@ if __name__=="__main__":
                     vel_msg_zero = geometry_msgs.msg.Twist(geometry_msgs.msg.Vector3(0,0,0), \
                                                   	geometry_msgs.msg.Vector3(0,0,0))
                     print time.time() - delay[i]
-                    if time.time() - delay[i] > 0.01:
+                    if time.time() - delay[i] > 5:
                         pub[i].publish(vel_msg)
                         color_pub[i].publish(col_msg)
-                        if mG == True and (v_x_V_new != 0 or v_y_V_new != 0) and moveVect[i] == 1:
-                            # Sleep with latency correction
-                            mG = moveGood(bVicon, v_x_V_new, v_y_V_new, i)
-                        else:
-                            mG = True
-                        time.sleep(0.3)
                     else:
                         pub[i].publish(vel_msg_zero)
                     rate.sleep()
@@ -718,20 +638,12 @@ if __name__=="__main__":
                                                     geometry_msgs.msg.Vector3(0,0,0))
                     pub[i].publish(vel_msg)
                     rate.sleep()
-                    if reach[i] == 0:
-                        time.sleep(Num * 2)
-                        locAll[i+Diff] = aVicon[i+Diff].getPose()
-                        vect2goal[i] = numpy.array([(loc_goal[i][0]-locAll[i+Diff][0]),(loc_goal[i][1]-locAll[i+Diff][1])])
-                        dist2goal[i] =  numpy.sqrt(vect2goal[i].dot(vect2goal[i]))
-                    if dist2goal[i] > 0.2:
-                            velNum[i] = 0.95 * velNum[i]
                     # This may cause bugs. Take caution.
-                    elif moveVect[i] == 1:
-                        reach[i] = 1
+                    if moveVect[i] == 1:
                         reset = True
                         rearrange = False
                         for k in range(Num):
-                            if i != k and moveVect[k] != 0:
+                            if i != k and moveVect[k] == 1:
                                 reset = False
                             if i != k and 1 > moveVect[k] > 0:
                                 rearrange = True
@@ -741,14 +653,11 @@ if __name__=="__main__":
                         # Spheros are parking
                         elif rearrange == True:
                             # Stop the current sphero
-                            moveVect[i] = 0
+                            moveVect[i] == 0
                             # Find the index of the next bot that we wish to move
                             nextBot = moveVect.index(max(moveVect))
-                            print "nextBot"
-                            print nextBot
                             # Start moving that bot
                             moveVect[nextBot] = 1
-                            print moveVect
                         # Else, all spheros are moving. Do nothing.
 
                 #rospy.loginfo("Velocity: {0}".format(vel_msg))
@@ -762,8 +671,8 @@ if __name__=="__main__":
         	dist2goalAll = sum(dist2goal)
 
 
-    # rospy.loginfo("Last Odometry: {0}".format(odometry))
-    # rospy.loginfo("Last Odometry: {0}".format(odometry))
+    rospy.loginfo("Last Odometry: {0}".format(odometry))
+    rospy.loginfo("Last Odometry: {0}".format(odometry))
     print mW
     print park
     print locAll

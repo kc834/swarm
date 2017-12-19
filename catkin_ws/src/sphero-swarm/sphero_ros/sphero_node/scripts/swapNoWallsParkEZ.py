@@ -254,7 +254,7 @@ if __name__=="__main__":
     #Calibrate sphero frame
 
     sphero_theta = [0.0]*Num
-    velNum = [[]]*Num
+    velNum = [60, 160, 160, 160, 60, 160, 60, 60, 60]
     velMin = [[]]*Num
 
     print "test"
@@ -267,7 +267,7 @@ if __name__=="__main__":
     # I don't like this. It only moves one sphero at a time. We should swarm.
     for i in range(Num):
         rate.sleep()
-        veltmp = vel_mag - 10
+        veltmp = velNum[i] - 10
         calibVect = numpy.array([0,0])
         labVel = numpy.linalg.norm(calibVect)
 
@@ -310,7 +310,7 @@ if __name__=="__main__":
 
         # Set sphero_theta to calibration theta
         sphero_theta[i] = calib_theta
-        velNum[i] = 1.5 * veltmp
+        velNum[i] = 1.4 * veltmp
 
     # Find location of all
     locAll = [[]]*numAll
