@@ -254,7 +254,7 @@ if __name__=="__main__":
     #Calibrate sphero frame
 
     sphero_theta = [0.0]*Num
-    velNum = [[]]*Num
+    velNum = [150, 150, 50, 50, 150, 150, 50, 150, 50]
     velMin = [[]]*Num
 
     print "test"
@@ -267,7 +267,8 @@ if __name__=="__main__":
     # I don't like this. It only moves one sphero at a time. We should swarm.
     for i in range(Num):
         rate.sleep()
-        veltmp = vel_mag - 10
+        #veltmp = vel_mag - 10
+        veltmp = velNum[i] - 10
         calibVect = numpy.array([0,0])
         labVel = numpy.linalg.norm(calibVect)
 
@@ -310,7 +311,7 @@ if __name__=="__main__":
 
         # Set sphero_theta to calibration theta
         sphero_theta[i] = calib_theta
-        velNum[i] = 1.5 * veltmp
+        velNum[i] = 1.35 * veltmp
 
     # Find location of all
     locAll = [[]]*numAll
@@ -363,6 +364,16 @@ if __name__=="__main__":
 
         mG = True
 
+        leftWall = 0
+        rightWall = 6 * s
+        bottomWall = 0
+        topWall = 6 * s
+
+        xMin = leftWall - 3 * s
+        yMin = bottomWall - 3 * s
+        xMax = rightWall + 3 * s
+        yMax = topWall + 3 * s
+
         # Assume 0.1*(Num+2) is small enough that it's basically 0
         while (dist2goalAll > 0.1*(Num+2)): # not at goal point
 
@@ -412,16 +423,6 @@ if __name__=="__main__":
 
                 # Parking algorithm
 
-                leftWall = 0
-                rightWall = 6 * s
-                bottomWall = 0
-                topWall = 6 * s
-
-                xMin = leftWall - 3 * obj.Ds
-                yMin = bottomWall - 3 * obj.Ds
-                xMax = rightWall + 3 * obj.Ds
-                yMax = topWall + 3 * obj.Ds
-
                 Region = 0;
 
                 if poseAll[0,i+Diff] > xMin and poseAll[0,i+Diff] < leftWall:
@@ -462,24 +463,32 @@ if __name__=="__main__":
                         if i != k:
                             moveVect[k] = 0
                     delay[i] = time.time()
-                    currentWay = numpy.linalg.norm([ loc_goal[i][0] - poseAll[0,i+Diff], loc_goal[i][1] - poseAll[1,i+Diff]])
+                    currentWay = 1000
+                    # currentWay = numpy.linalg.norm([ loc_goal[i][0] - poseAll[0,i+Diff], loc_goal[i][1] - poseAll[1,i+Diff]])
                     vel_msg_zero = geometry_msgs.msg.Twist(geometry_msgs.msg.Vector3(0,0,0), \
                                                   	geometry_msgs.msg.Vector3(0,0,0))
                     pub[i].publish(vel_msg_zero)
                     rate.sleep()
+                    row = -1
+                    col = -1
                     for i in range(3):
-                        for k in park[i]:
-                            dist = numpy.linalg.norm([ k[0] - poseAll[0,i+Diff], k[1] - poseAll[1,i+Diff]])
-                            if dist == currentWay:
-                                row = i
-                                col = k
-                            if dist < currentWay:
-                                currentWay = dist
-                                obj.goalPose[0,Diff+i] = k[0]
-                                obj.goalPose[1,Diff+i] = k[1]
-                                row = i
-                                col = k
+                        for j in range(3):
+                            if mW[i][j] == 0:
+                                k = park[i][j]
+                                dist = numpy.linalg.norm([ k[0] - poseAll[0,i+Diff], k[1] - poseAll[1,i+Diff]])
+                                if dist < currentWay:
+                                    currentWay = dist
+                                    loc_goal[i][0] = k[0]
+                                    loc_goal[i][1] = k[1]
+                                    obj.goalPose[0,Diff+i] = loc_goal[i][0]
+                                    obj.goalPose[1,Diff+i] = loc_goal[i][1]
+                                    row = i
+                                    col = j
+                    if row == -1 or col == -1:
+                        print "Parking Space Full"
+                        sys.exit(0)
                     mW[row][col] = 1
+                    park[row][loc][2] = i
 
                 if 4 >= Region >= 1 and delay[i] == defaultTime and moveVect[i] != 0:
                     vel_msg_zero = geometry_msgs.msg.Twist(geometry_msgs.msg.Vector3(0,0,0), \
@@ -555,7 +564,7 @@ if __name__=="__main__":
                                 moveVect[botIndex] = 1
                                 reach[botIndex] = 0
                                 # Move the adjacent bot in row 1 to row 2
-                                botIndex = park[rowAdjAdj][locAdjAdj][2]
+                                botIndex = int(park[rowAdjAdj][locAdjAdj][2])
                                 # PRETEND THAT I = J
                                 loc_goal[botIndex][0] = park[rowAdj][locAdj][0]
                                 loc_goal[botIndex][1] = park[rowAdj][locAdj][1]
@@ -623,8 +632,8 @@ if __name__=="__main__":
                             thetaNew[i] = numpy.arctan2((v_vect_V_actual[1]),(v_vect_V_actual[0]))
 
                             if thetaOld != 0 and thetaNew[i] != thetaOld:
-                                v_x_V_new = 0.9 * moveVect[i] * velNum[i] * math.cos(thetaNew[i])
-                                v_y_V_new = 0.9 * moveVect[i] * velNum[i] * math.sin(thetaNew[i])
+                                v_x_V_new = 0.8 * moveVect[i] * velNum[i] * math.cos(thetaNew[i])
+                                v_y_V_new = 0.8 * moveVect[i] * velNum[i] * math.sin(thetaNew[i])
                             else:
                                 v_x_V_new = moveVect[i] * velNum[i] * math.cos(thetaNew[i])
                                 v_y_V_new = moveVect[i] * velNum[i] * math.sin(thetaNew[i])
@@ -659,8 +668,8 @@ if __name__=="__main__":
 
                             thetaNew[i] = numpy.arctan2((loc_goal[i][1]-locAll[i+Diff][1]), (loc_goal[i][0]-locAll[i+Diff][0]))
 
-                            v_x_V_new = 0.9 * moveVect[i] * velNum[i] * math.cos(thetaNew[i])
-                            v_y_V_new = 0.9 * moveVect[i] * velNum[i] * math.sin(thetaNew[i])
+                            v_x_V_new = 0.8 * moveVect[i] * velNum[i] * math.cos(thetaNew[i])
+                            v_y_V_new = 0.8 * moveVect[i] * velNum[i] * math.sin(thetaNew[i])
 
                             print moveVect[i]
                             print velNum[i]
